@@ -1,0 +1,53 @@
+{
+  "name": "snowflake-mcp",
+  "version": "1.0.0",
+  "description": "A Model Context Protocol server for Snowflake database integration",
+  "tools": [
+    {
+      "name": "query_database",
+      "description": "Execute an SQL query or natural language query on the Snowflake database",
+      "parameters": {
+        "query": {
+          "type": "string",
+          "description": "The SQL query or natural language question to execute"
+        },
+        "is_natural_language": {
+          "type": "boolean",
+          "description": "Whether the query is in natural language (true) or SQL (false)",
+          "default": false
+        },
+        "max_rows": {
+          "type": "integer",
+          "description": "Maximum number of rows to return",
+          "default": 20
+        }
+      },
+      "required": ["query"]
+    },
+    {
+      "name": "list_tables",
+      "description": "List all tables in the database",
+      "parameters": {
+        "schema": {
+          "type": "string",
+          "description": "The schema to list tables from (optional)"
+        }
+      }
+    },
+    {
+      "name": "get_table_schema",
+      "description": "Get the schema of a specific table",
+      "parameters": {
+        "table_name": {
+          "type": "string",
+          "description": "The name of the table"
+        },
+        "schema": {
+          "type": "string",
+          "description": "The schema containing the table (optional)"
+        }
+      },
+      "required": ["table_name"]
+    }
+  ]
+}
