@@ -7,6 +7,7 @@ repository: https://github.com/yourusername/snowflake-mcp
 startCommand:
   type: stdio
   configSchema:
+    # JSON Schema defining the configuration options for the MCP
     SNOWFLAKE_USER:
       type: string
       description: Snowflake username
@@ -33,20 +34,20 @@ startCommand:
       required: false
   commandFunction: |-
     (config) => ({
-      command: "python",
-      args: ["src/server.py"],
-      env: {
-        SNOWFLAKE_USER: config.SNOWFLAKE_USER,
-        SNOWFLAKE_PASSWORD: config.SNOWFLAKE_PASSWORD,
-        SNOWFLAKE_ACCOUNT: config.SNOWFLAKE_ACCOUNT,
-        SNOWFLAKE_DATABASE: config.SNOWFLAKE_DATABASE,
-        SNOWFLAKE_WAREHOUSE: config.SNOWFLAKE_WAREHOUSE,
-        SNOWFLAKE_SCHEMA: config.SNOWFLAKE_SCHEMA || "PUBLIC",
-        SNOWFLAKE_LAZY_INIT: "true",
-        MCP_TRANSPORT: "websocket",
-        MCP_WEBSOCKET_PORT: "8080",
-        MCP_WEBSOCKET_HOST: "0.0.0.0",
-        ...(config.SNOWFLAKE_ROLE ? { SNOWFLAKE_ROLE: config.SNOWFLAKE_ROLE } : {})
+      "command": "python",
+      "args": ["src/server.py"],
+      "env": {
+        "SNOWFLAKE_USER": config.SNOWFLAKE_USER,
+        "SNOWFLAKE_PASSWORD": config.SNOWFLAKE_PASSWORD,
+        "SNOWFLAKE_ACCOUNT": config.SNOWFLAKE_ACCOUNT,
+        "SNOWFLAKE_DATABASE": config.SNOWFLAKE_DATABASE,
+        "SNOWFLAKE_WAREHOUSE": config.SNOWFLAKE_WAREHOUSE,
+        "SNOWFLAKE_SCHEMA": config.SNOWFLAKE_SCHEMA || "PUBLIC",
+        "SNOWFLAKE_LAZY_INIT": "true",
+        "MCP_TRANSPORT": "websocket",
+        "MCP_WEBSOCKET_PORT": "8080",
+        "MCP_WEBSOCKET_HOST": "0.0.0.0",
+        ...(config.SNOWFLAKE_ROLE ? { "SNOWFLAKE_ROLE": config.SNOWFLAKE_ROLE } : {})
       }
     })
 

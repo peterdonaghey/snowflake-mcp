@@ -1,7 +1,7 @@
 {
   "name": "snowflake-mcp",
   "version": "1.0.0",
-  "description": "A Model Context Protocol server for Snowflake database integration",
+  "description": "A Model Context Protocol (MCP) server for Snowflake database integration",
   "tools": [
     {
       "name": "query_database",
@@ -28,7 +28,7 @@
       "name": "list_tables",
       "description": "List all tables in the database",
       "parameters": {
-        "schema": {
+        "schema_name": {
           "type": "string",
           "description": "The schema to list tables from (optional)"
         }
@@ -42,7 +42,7 @@
           "type": "string",
           "description": "The name of the table"
         },
-        "schema": {
+        "schema_name": {
           "type": "string",
           "description": "The schema containing the table (optional)"
         }
