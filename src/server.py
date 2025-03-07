@@ -20,6 +20,7 @@ import sys
 import json
 import logging
 import atexit
+import signal
 from typing import Dict, Any, List, Optional
 import pandas as pd
 from dotenv import load_dotenv
@@ -27,8 +28,9 @@ from dotenv import load_dotenv
 try:
     # Import the official MCP Python SDK
     from mcp.server.fastmcp import FastMCP
-except ImportError:
-    print("Error: MCP Python SDK not found.")
+    print("Successfully imported FastMCP from mcp.server.fastmcp")
+except ImportError as e:
+    print(f"Error: MCP Python SDK not found: {e}")
     print("Please install it using: pip install mcp")
     sys.exit(1)
 
@@ -231,8 +233,19 @@ def cleanup():
 # Register the cleanup function to run at exit
 atexit.register(cleanup)
 
+# Timeout handler
+def timeout_handler(signum, frame):
+    logger.error("Server startup timed out! Exiting...")
+    sys.exit(1)
+
 # Standalone execution
 if __name__ == "__main__":
+    # Set a timeout for 30 seconds to prevent hanging
+    signal.signal(signal.SIGALRM, timeout_handler)
+    signal.alarm(30)  # 30 seconds timeout
+    
+    print("Starting server with MCP version:", getattr(FastMCP, "__version__", "unknown"))
+    
     # Check for lazy initialization flag
     lazy_init = os.environ.get("SNOWFLAKE_LAZY_INIT", "false").lower() == "true"
     
@@ -247,4 +260,10 @@ if __name__ == "__main__":
 
     # Run the MCP server directly (SDK will handle transport)
     logger.info("Starting MCP server...")
-    mcp.run()
+    try:
+        # Cancel the alarm once we're about to start the server
+        signal.alarm(0)
+        mcp.run()
+    except Exception as e:
+        logger.error(f"Error running MCP server: {e}")
+        sys.exit(1)
