@@ -227,13 +227,20 @@ def cleanup():
 # Register the cleanup function to run at exit
 atexit.register(cleanup)
 
-# Establish initial connection for faster startup
-logger.info("Starting Snowflake MCP server...")
-if not ensure_connection():
-    logger.warning("Failed to establish initial Snowflake connection. Will retry on first request.")
-
 # Standalone execution
 if __name__ == "__main__":
+    # Check for lazy initialization flag
+    lazy_init = os.environ.get("SNOWFLAKE_LAZY_INIT", "false").lower() == "true"
+    
+    # Only try to establish initial connection if not in lazy mode
+    if not lazy_init:
+        logger.info("Starting Snowflake MCP server with eager connection...")
+        if not ensure_connection():
+            logger.warning("Failed to establish initial Snowflake connection. Will retry on first request.")
+    else:
+        logger.info("Starting Snowflake MCP server with lazy connection initialization...")
+        logger.info("Snowflake connection will be established on first request.")
+
     # Determine transport type from environment variable
     transport_type = os.environ.get("MCP_TRANSPORT", "stdio").lower()
     

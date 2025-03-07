@@ -22,7 +22,10 @@ ENV MCP_TRANSPORT=websocket
 ENV MCP_WEBSOCKET_PORT=8080
 ENV MCP_WEBSOCKET_HOST=0.0.0.0
 
-# Run server
+# Explicitly set Snowflake connection to lazy initialization
+ENV SNOWFLAKE_LAZY_INIT=true
+
+# Run server directly with Python
 CMD ["python", "src/server.py"]
 
 # Expose the port for WebSocket communication
