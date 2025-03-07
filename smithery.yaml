@@ -37,28 +37,58 @@ tools:
         description: The schema containing the table (optional)
     required:
       - table_name
-configSchema:
-  SNOWFLAKE_USER:
-    type: string
-    description: Snowflake username
-  SNOWFLAKE_PASSWORD:
-    type: string
-    description: Snowflake password
-    secret: true
-  SNOWFLAKE_ACCOUNT:
-    type: string
-    description: Snowflake account identifier (e.g., xy12345.us-east-2)
-  SNOWFLAKE_DATABASE:
-    type: string
-    description: Snowflake database name
-  SNOWFLAKE_WAREHOUSE:
-    type: string
-    description: Snowflake warehouse name
-  SNOWFLAKE_SCHEMA:
-    type: string
-    description: Snowflake schema name (default PUBLIC)
-    default: PUBLIC
-  SNOWFLAKE_ROLE:
-    type: string
-    description: Snowflake role name (optional)
-    required: false
+
+startCommand:
+  type: stdio
+  configSchema:
+    SNOWFLAKE_USER:
+      type: string
+      description: Snowflake username
+    SNOWFLAKE_PASSWORD:
+      type: string
+      description: Snowflake password
+      secret: true
+    SNOWFLAKE_ACCOUNT:
+      type: string
+      description: Snowflake account identifier (e.g., xy12345.us-east-2)
+    SNOWFLAKE_DATABASE:
+      type: string
+      description: Snowflake database name
+    SNOWFLAKE_WAREHOUSE:
+      type: string
+      description: Snowflake warehouse name
+    SNOWFLAKE_SCHEMA:
+      type: string
+      description: Snowflake schema name
+      default: PUBLIC
+    SNOWFLAKE_ROLE:
+      type: string
+      description: Snowflake role name (optional)
+      required: false
+  commandFunction: |
+    function getCommand(config) {
+      // Create environment variables from config
+      const env = {
+        SNOWFLAKE_USER: config.SNOWFLAKE_USER,
+        SNOWFLAKE_PASSWORD: config.SNOWFLAKE_PASSWORD,
+        SNOWFLAKE_ACCOUNT: config.SNOWFLAKE_ACCOUNT,
+        SNOWFLAKE_DATABASE: config.SNOWFLAKE_DATABASE,
+        SNOWFLAKE_WAREHOUSE: config.SNOWFLAKE_WAREHOUSE,
+        SNOWFLAKE_SCHEMA: config.SNOWFLAKE_SCHEMA || "PUBLIC",
+        SNOWFLAKE_LAZY_INIT: "true",
+        MCP_TRANSPORT: "websocket",
+        MCP_WEBSOCKET_PORT: "8080",
+        MCP_WEBSOCKET_HOST: "0.0.0.0"
+      };
+      
+      // Add optional role if provided
+      if (config.SNOWFLAKE_ROLE) {
+        env.SNOWFLAKE_ROLE = config.SNOWFLAKE_ROLE;
+      }
+      
+      return {
+        command: "python",
+        args: ["src/server.py"],
+        env: env
+      };
+    }

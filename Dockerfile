@@ -6,6 +6,9 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Explicitly install MCP SDK in case requirements.txt doesn't work
+RUN pip install --no-cache-dir mcp mcp-sdk
+
 # Copy source code
 COPY src/ ./src/
 COPY examples/ ./examples/
