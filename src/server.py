@@ -27,8 +27,6 @@ from dotenv import load_dotenv
 try:
     # Import the official MCP Python SDK
     from mcp.server.fastmcp import FastMCP
-    from mcp.transports.stdio import StdioTransport
-    from mcp.transports.websocket import WebSocketTransport
 except ImportError:
     print("Error: MCP Python SDK not found.")
     print("Please install it using: pip install mcp")
@@ -149,17 +147,17 @@ def query_database(
         
 # List Tables Tool
 @mcp.tool(description="List all tables in the database")
-def list_tables(schema: Optional[str] = None) -> Dict[str, Any]:
+def list_tables(schema_name: Optional[str] = None) -> Dict[str, Any]:
     """
     List all tables in the database.
     
     Args:
-        schema: The schema to list tables from (optional)
+        schema_name: The schema to list tables from (optional)
         
     Returns:
         Dictionary with list of tables and status
     """
-    logger.info(f"Handling list_tables request for schema: {schema}")
+    logger.info(f"Handling list_tables request for schema: {schema_name}")
     
     # Ensure Snowflake connection
     if not ensure_connection():
@@ -170,7 +168,7 @@ def list_tables(schema: Optional[str] = None) -> Dict[str, Any]:
         }
     
     try:
-        tables = snowflake.list_tables(schema)
+        tables = snowflake.list_tables(schema_name)
         return {
             "success": True,
             "message": f"Found {len(tables)} tables",
@@ -186,47 +184,40 @@ def list_tables(schema: Optional[str] = None) -> Dict[str, Any]:
         
 # Get Table Schema Tool
 @mcp.tool(description="Get the schema of a specific table")
-def get_table_schema(table_name: str, schema: Optional[str] = None) -> Dict[str, Any]:
+def get_table_schema(table_name: str, schema_name: Optional[str] = None) -> Dict[str, Any]:
     """
     Get the schema of a table.
     
     Args:
         table_name: The name of the table
-        schema: The schema containing the table (optional)
+        schema_name: The schema containing the table (optional)
         
     Returns:
-        Dictionary with column information and status
+        Dictionary with table schema and status
     """
-    logger.info(f"Handling get_table_schema request for table: {table_name}")
-    
-    if not table_name:
-        return {
-            "success": False,
-            "message": "Table name is required",
-            "columns": {}
-        }
+    logger.info(f"Handling get_table_schema request for table: {table_name} in schema: {schema_name}")
     
     # Ensure Snowflake connection
     if not ensure_connection():
         return {
             "success": False,
             "message": "Failed to connect to Snowflake",
-            "columns": {}
+            "schema": {}
         }
     
     try:
-        columns = snowflake.get_table_schema(table_name, schema)
+        schema = snowflake.get_table_schema(table_name, schema_name)
         return {
             "success": True,
-            "message": f"Found {len(columns)} columns",
-            "columns": columns
+            "message": f"Retrieved schema for table {table_name}",
+            "schema": schema
         }
     except Exception as e:
         logger.error(f"Error getting table schema: {str(e)}")
         return {
             "success": False,
             "message": f"Error getting table schema: {str(e)}",
-            "columns": {}
+            "schema": {}
         }
 
 # Handle graceful shutdown
@@ -254,18 +245,6 @@ if __name__ == "__main__":
         logger.info("Starting Snowflake MCP server with lazy connection initialization...")
         logger.info("Snowflake connection will be established on first request.")
 
-    # Determine transport type from environment variable
-    transport_type = os.environ.get("MCP_TRANSPORT", "stdio").lower()
-    
-    if transport_type == "websocket":
-        # WebSocket transport for Smithery deployment
-        port = int(os.environ.get("MCP_WEBSOCKET_PORT", 8080))
-        host = os.environ.get("MCP_WEBSOCKET_HOST", "0.0.0.0")
-        logger.info(f"Running MCP server with WebSocket transport on {host}:{port}...")
-        transport = WebSocketTransport(mcp, host=host, port=port)
-        transport.run()
-    else:
-        # Default to stdio transport for local use
-        logger.info("Running MCP server with stdio transport...")
-        transport = StdioTransport(mcp)
-        transport.run()
+    # Run the MCP server directly (SDK will handle transport)
+    logger.info("Starting MCP server...")
+    mcp.run()

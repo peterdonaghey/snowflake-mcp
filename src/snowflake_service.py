@@ -143,18 +143,18 @@ class SnowflakeService:
             logger.error(error_msg)
             return False, error_msg
 
-    def list_tables(self, schema: Optional[str] = None) -> List[str]:
+    def list_tables(self, schema_name: Optional[str] = None) -> List[str]:
         """
         List all tables in the current database and schema.
         
         Args:
-            schema (Optional[str]): The schema to list tables from. If None, uses the default schema.
+            schema_name (Optional[str]): The schema to list tables from. If None, uses the default schema.
             
         Returns:
             List[str]: A list of table names
         """
-        schema_name = schema or self.connection_params["schema"]
-        query = f"SHOW TABLES IN {self.connection_params['database']}.{schema_name}"
+        schema = schema_name or self.connection_params["schema"]
+        query = f"SHOW TABLES IN {self.connection_params['database']}.{schema}"
         success, result = self.execute_query(query)
         
         if success and isinstance(result, pd.DataFrame) and not result.empty:
@@ -164,19 +164,19 @@ class SnowflakeService:
         
         return []
 
-    def get_table_schema(self, table_name: str, schema: Optional[str] = None) -> Dict[str, str]:
+    def get_table_schema(self, table_name: str, schema_name: Optional[str] = None) -> Dict[str, str]:
         """
         Get the schema of a table.
         
         Args:
             table_name (str): The name of the table
-            schema (Optional[str]): The schema containing the table. If None, uses the default schema.
+            schema_name (Optional[str]): The schema containing the table. If None, uses the default schema.
             
         Returns:
             Dict[str, str]: A dictionary mapping column names to their data types
         """
-        schema_name = schema or self.connection_params["schema"]
-        query = f"DESCRIBE TABLE {self.connection_params['database']}.{schema_name}.{table_name}"
+        schema = schema_name or self.connection_params["schema"]
+        query = f"DESCRIBE TABLE {self.connection_params['database']}.{schema}.{table_name}"
         success, result = self.execute_query(query)
         
         if success and isinstance(result, pd.DataFrame) and not result.empty:
