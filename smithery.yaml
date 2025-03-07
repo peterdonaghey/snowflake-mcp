@@ -1,0 +1,64 @@
+name: snowflake-mcp
+version: 1.0.0
+description: A Model Context Protocol (MCP) server for Snowflake database integration
+repository: https://github.com/yourusername/snowflake-mcp
+type: websocket
+tools:
+  - name: query_database
+    description: Execute an SQL query or natural language query on the Snowflake database
+    parameters:
+      query:
+        type: string
+        description: The SQL query or natural language question to execute
+      is_natural_language:
+        type: boolean
+        description: Whether the query is in natural language (true) or SQL (false)
+        default: false
+      max_rows:
+        type: integer
+        description: Maximum number of rows to return
+        default: 20
+    required:
+      - query
+  - name: list_tables
+    description: List all tables in the database
+    parameters:
+      schema_name:
+        type: string
+        description: The schema to list tables from (optional)
+  - name: get_table_schema
+    description: Get the schema of a specific table
+    parameters:
+      table_name:
+        type: string
+        description: The name of the table
+      schema_name:
+        type: string
+        description: The schema containing the table (optional)
+    required:
+      - table_name
+configSchema:
+  SNOWFLAKE_USER:
+    type: string
+    description: Snowflake username
+  SNOWFLAKE_PASSWORD:
+    type: string
+    description: Snowflake password
+    secret: true
+  SNOWFLAKE_ACCOUNT:
+    type: string
+    description: Snowflake account identifier (e.g., xy12345.us-east-2)
+  SNOWFLAKE_DATABASE:
+    type: string
+    description: Snowflake database name
+  SNOWFLAKE_WAREHOUSE:
+    type: string
+    description: Snowflake warehouse name
+  SNOWFLAKE_SCHEMA:
+    type: string
+    description: Snowflake schema name (default PUBLIC)
+    default: PUBLIC
+  SNOWFLAKE_ROLE:
+    type: string
+    description: Snowflake role name (optional)
+    required: false
