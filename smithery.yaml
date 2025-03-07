@@ -46,8 +46,7 @@ startCommand:
         "SNOWFLAKE_LAZY_INIT": "true",
         "MCP_TRANSPORT": "websocket",
         "MCP_WEBSOCKET_PORT": "8080",
-        "MCP_WEBSOCKET_HOST": "0.0.0.0",
-        ...(config.SNOWFLAKE_ROLE ? { "SNOWFLAKE_ROLE": config.SNOWFLAKE_ROLE } : {})
+        "MCP_WEBSOCKET_HOST": "0.0.0.0"
       }
     })
 
