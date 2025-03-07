@@ -3,35 +3,46 @@ version: 1.0.0
 description: A Model Context Protocol (MCP) server for Snowflake database integration
 repository: https://github.com/yourusername/snowflake-mcp
 
+# Smithery configuration file: https://smithery.ai/docs/deployments
+
+build:
+  dockerBuildPath: .
+
 # Smithery.ai configuration
 startCommand:
   type: stdio
   configSchema:
-    # JSON Schema defining the configuration options for the MCP
-    SNOWFLAKE_USER:
-      type: string
-      description: Snowflake username
-    SNOWFLAKE_PASSWORD:
-      type: string
-      description: Snowflake password
-      secret: true
-    SNOWFLAKE_ACCOUNT:
-      type: string
-      description: Snowflake account identifier (e.g., xy12345.us-east-2)
-    SNOWFLAKE_DATABASE:
-      type: string
-      description: Snowflake database name
-    SNOWFLAKE_WAREHOUSE:
-      type: string
-      description: Snowflake warehouse name
-    SNOWFLAKE_SCHEMA:
-      type: string
-      description: Snowflake schema name
-      default: PUBLIC
-    SNOWFLAKE_ROLE:
-      type: string
-      description: Snowflake role name (optional)
-      required: false
+    type: object
+    required:
+      - SNOWFLAKE_USER
+      - SNOWFLAKE_PASSWORD
+      - SNOWFLAKE_ACCOUNT
+      - SNOWFLAKE_DATABASE
+      - SNOWFLAKE_WAREHOUSE
+    properties:
+      SNOWFLAKE_USER:
+        type: string
+        description: "Snowflake username"
+      SNOWFLAKE_PASSWORD:
+        type: string
+        description: "Snowflake password"
+        secret: true
+      SNOWFLAKE_ACCOUNT:
+        type: string
+        description: "Snowflake account identifier (e.g., xy12345.us-east-2)"
+      SNOWFLAKE_DATABASE:
+        type: string
+        description: "Snowflake database name"
+      SNOWFLAKE_WAREHOUSE:
+        type: string
+        description: "Snowflake warehouse name"
+      SNOWFLAKE_SCHEMA:
+        type: string
+        description: "Snowflake schema name"
+        default: "PUBLIC"
+      SNOWFLAKE_ROLE:
+        type: string
+        description: "Snowflake role name (optional)"
   commandFunction: |-
     (config) => ({
       "command": "python",

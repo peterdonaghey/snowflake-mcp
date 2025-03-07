@@ -6,6 +6,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     python3-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy only requirements first for better caching
@@ -13,7 +14,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Explicitly install MCP SDK to ensure it's available
-RUN pip install --no-cache-dir mcp==0.3.0
+RUN pip install --no-cache-dir "mcp>=0.3.0,<2.0.0"
 
 # Copy source code
 COPY src/ ./src/

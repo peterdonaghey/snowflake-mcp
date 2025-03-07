@@ -62,6 +62,19 @@ mcp = FastMCP(
 # Helper function to ensure we have a Snowflake connection
 def ensure_connection() -> bool:
     """Ensure we have an active Snowflake connection."""
+    # Always check if lazy initialization is enabled
+    lazy_init = os.environ.get("SNOWFLAKE_LAZY_INIT", "false").lower() == "true"
+    
+    # For deployment environments, log but don't fail if we can't connect initially
+    if lazy_init and not snowflake.connected:
+        try:
+            logger.info("Lazily establishing Snowflake connection...")
+            return snowflake.connect()
+        except Exception as e:
+            logger.warning(f"Lazy connection initialization failed, will retry on first request: {str(e)}")
+            return False
+            
+    # Standard connection check for non-lazy mode
     if not snowflake.connected:
         logger.info("Establishing Snowflake connection...")
         return snowflake.connect()
